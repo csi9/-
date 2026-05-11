@@ -24,10 +24,12 @@ jobs:
         run: unzip final-apk-ready-project.zip
 
       - name: Build APK
-        run: flutter build apk --release
+        run: |
+          cd * /
+          flutter build apk --release
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
           name: my-app-apk
-          path: build/app/outputs/flutter-apk/app-release.apk
+          path: "**/build/app/outputs/flutter-apk/app-release.apk"
