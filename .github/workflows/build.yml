@@ -21,17 +21,17 @@ jobs:
       - name: Unzip and Install Dependencies
         run: |
           unzip -o final-apk-ready-project.zip
-          # الدخول للمجلد اللي فكينا ضغطه
           cd final-apk-ready-project
-          npm install
-          # تنصيب الكاباسيتور بشكل صريح
-          npm install @capacitor/core @capacitor/cli @capacitor/android
+          # تنظيف وتنصيب إجباري لتجنب تضارب النسخ
+          npm install --force --legacy-peer-deps
+          npm install @capacitor/core@latest @capacitor/cli@latest @capacitor/android@latest --force
           npm run build
 
       - name: Create and Build Android Platform
         run: |
           cd final-apk-ready-project
-          # إنشاء مجلد الاندرويد لأنه مفقود بملفك
+          # حذف المجلد القديم إذا وجد وإضافته من جديد
+          rm -rf android
           npx cap add android
           npx cap copy
           npx cap sync
