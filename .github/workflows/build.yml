@@ -7,7 +7,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: set up JDK 21 # التعديل هنا ليتوافق مع طلب مشروعك
+      - name: set up JDK 21
         uses: actions/setup-java@v4
         with:
           java-version: '21'
@@ -29,10 +29,11 @@ jobs:
           npx cap sync android
           cd android
           chmod +x gradlew
-          ./gradlew assembleRelease
+          # بناء نسخة Debug (تتثبت فوراً وبدون توقيع يدوي)
+          ./gradlew assembleDebug
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
-          name: my-app-apk
-          path: "**/android/app/build/outputs/apk/release/*.apk"
+          name: Shooting-Club-Cashier-App
+          path: "**/android/app/build/outputs/apk/debug/*.apk"
