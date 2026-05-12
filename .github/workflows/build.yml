@@ -1,4 +1,4 @@
-name: Build Alpha Range Final V18
+name: Build Alpha Range Final V19
 on: [workflow_dispatch]
 
 jobs:
@@ -18,12 +18,12 @@ jobs:
         with:
           node-version: '22'
 
-      - name: Extract, Patch and Fix Android
+      - name: Extract, Install and Build From Scratch
         run: |
           unzip -o final-apk-ready-project.zip
           cd final-apk-ready-project
           
-          # حقن نظام الكاشير الحقيقي
+          # حقن نظام الكاشير
           cat <<EOF > src/App.jsx
           import React, { useState } from 'react';
           export default function App() {
@@ -33,30 +33,31 @@ jobs:
             const [show, setShow] = useState(false);
             const add = () => { if (item && price) { setSales([...sales, { item, price: parseFloat(price), id: Date.now() }]); setItem(''); setPrice(''); } };
             if (!show) return (
-              <div style={{textAlign: 'center', padding: '50px', direction: 'rtl', background: '#0d1117', color: 'white', height: '100vh', fontFamily: 'Arial'}}>
-                <h1 style={{color: '#58a6ff'}}>ألفا رينج - Alpha Range</h1>
-                <button onClick={() => setShow(true)} style={{padding: '15px 40px', fontSize: '20px', background: '#238636', color: 'white', border: 'none', borderRadius: '10px', cursor: 'pointer', fontWeight: 'bold'}}>دخول للنظام</button>
+              <div style={{textAlign: 'center', padding: '50px', direction: 'rtl', background: '#0d1117', color: 'white', height: '100vh'}}>
+                <h1>نادي الرماية - ألفا رينج</h1>
+                <button onClick={() => setShow(true)} style={{padding: '15px 30px', fontSize: '20px', background: '#238636', color: 'white', border: 'none', borderRadius: '10px'}}>دخول للنظام</button>
               </div>
             );
             return (
-              <div style={{padding: '20px', direction: 'rtl', background: '#0d1117', color: 'white', minHeight: '100vh', fontFamily: 'Arial'}}>
-                <h2 style={{color: '#58a6ff'}}>كاشير نادي الرماية</h2>
-                <input placeholder="المادة" value={item} onChange={e => setItem(e.target.value)} style={{width: '90%', padding: '12px', marginBottom: '10px', borderRadius: '8px', background: '#161b22', color: 'white'}} />
-                <input placeholder="السعر" type="number" value={price} onChange={e => setPrice(e.target.value)} style={{width: '90%', padding: '12px', marginBottom: '10px', borderRadius: '8px', background: '#161b22', color: 'white'}} />
-                <button onClick={add} style={{width: '97%', padding: '15px', background: '#238636', color: 'white', border: 'none', borderRadius: '10px'}}>إضافة</button>
-                <div style={{marginTop: '30px'}}>
+              <div style={{padding: '20px', direction: 'rtl', background: '#0d1117', color: 'white', minHeight: '100vh'}}>
+                <h2>كاشير ألفا رينج</h2>
+                <input placeholder="المادة" value={item} onChange={e => setItem(e.target.value)} style={{width: '90%', padding: '10px', marginBottom: '10px'}} />
+                <input placeholder="السعر" type="number" value={price} onChange={e => setPrice(e.target.value)} style={{width: '90%', padding: '10px', marginBottom: '10px'}} />
+                <button onClick={add} style={{width: '95%', padding: '10px', background: '#238636', color: 'white'}}>إضافة</button>
+                <div style={{marginTop: '20px'}}>
                   {sales.map(s => <div key={s.id} style={{padding: '10px', borderBottom: '1px solid #30363d'}}>{s.item}: {s.price} د.ع</div>)}
-                  <h3 style={{color: '#f85149'}}>الإجمالي: {sales.reduce((a, b) => a + b.price, 0)} د.ع</h3>
+                  <h3>المجموع: {sales.reduce((a, b) => a + b.price, 0)} د.ع</h3>
                 </div>
-                <button onClick={() => setShow(false)} style={{color: '#f85149', background: 'none', border: 'none'}}>خروج</button>
+                <button onClick={() => setShow(false)} style={{marginTop: '20px', color: 'red'}}>خروج</button>
               </div>
             );
           }
           EOF
           
+          # تثبيت الأدوات اللي كانت ناقصة وتسببت بالخطأ
           npm install --force
+          npm install @capacitor/android --save-dev
           npm run build
-          # الخطوة اللي كانت ناقصة وصححتها هسة:
           npx cap add android || true
           npx cap sync android
           cd android && chmod +x gradlew && ./gradlew assembleDebug
@@ -64,5 +65,5 @@ jobs:
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
-          name: Alpha-Range-V18
+          name: Alpha-Range-V19
           path: "**/android/app/build/outputs/apk/debug/*.apk"
