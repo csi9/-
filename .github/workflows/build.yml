@@ -16,23 +16,19 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: '22' # التعديل هنا ليتوافق مع طلب المشروع
 
       - name: Unzip and Install Dependencies
         run: |
           unzip -o final-apk-ready-project.zip
           cd final-apk-ready-project
-          # تنظيف وتنصيب إجباري لتجنب تضارب النسخ
           npm install --force --legacy-peer-deps
-          npm install @capacitor/core@latest @capacitor/cli@latest @capacitor/android@latest --force
           npm run build
 
       - name: Create and Build Android Platform
         run: |
           cd final-apk-ready-project
-          # حذف المجلد القديم إذا وجد وإضافته من جديد
-          rm -rf android
-          npx cap add android
+          npx cap add android || true
           npx cap copy
           npx cap sync
           cd android
