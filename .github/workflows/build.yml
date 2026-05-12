@@ -1,11 +1,9 @@
-name: Build Release APK
+name: Build Android APK
 on: [workflow_dispatch]
 
 jobs:
   build:
     runs-on: ubuntu-latest
-    env:
-      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
     steps:
       - uses: actions/checkout@v4
 
@@ -15,18 +13,32 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
 
-      - name: Install Flutter
-        uses: subosito/flutter-action@v2
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
         with:
-          flutter-version: 'any'
+          node-version: '20'
 
-      - name: Unzip and Build
+      - name: Unzip and Install
         run: |
           unzip -o final-apk-ready-project.zip
-          flutter build apk --release
+          # الدخول للمجلد اللي فكينا ضغطه
+          cd final-apk-ready-project
+          npm install
+          # بناء ملفات الويب
+          npm run build
+
+      - name: Build Android with Capacitor
+        run: |
+          cd final-apk-ready-project
+          # إضافة منصة اندرويد وبناء التطبيق
+          npx cap add android || true
+          npx cap copy
+          cd android
+          chmod +x gradlew
+          ./gradlew assembleRelease
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
           name: my-app-apk
-          path: "build/app/outputs/flutter-apk/app-release.apk"
+          path: "**/android/app/build/outputs/apk/release/*.apk"
