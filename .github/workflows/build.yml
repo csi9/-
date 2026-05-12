@@ -1,4 +1,4 @@
-name: Build Alpha Range Final V19
+name: Build Alpha Range Final V20
 on: [workflow_dispatch]
 
 jobs:
@@ -16,14 +16,14 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '22'
+          node-version: '20'
 
-      - name: Extract, Install and Build From Scratch
+      - name: Final Force Build
         run: |
           unzip -o final-apk-ready-project.zip
           cd final-apk-ready-project
           
-          # حقن نظام الكاشير
+          # حقن نظام الكاشير (نسخة مستقرة)
           cat <<EOF > src/App.jsx
           import React, { useState } from 'react';
           export default function App() {
@@ -54,9 +54,10 @@ jobs:
           }
           EOF
           
-          # تثبيت الأدوات اللي كانت ناقصة وتسببت بالخطأ
-          npm install --force
-          npm install @capacitor/android --save-dev
+          # تثبيت إجباري متوافق مع نسخة Capacitor 6.0.0 المذكورة في ملفك
+          npm install --legacy-peer-deps
+          npm install @capacitor/android@6.0.0 --save-exact --legacy-peer-deps
+          
           npm run build
           npx cap add android || true
           npx cap sync android
@@ -65,5 +66,5 @@ jobs:
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
-          name: Alpha-Range-V19
+          name: Alpha-Range-V20
           path: "**/android/app/build/outputs/apk/debug/*.apk"
