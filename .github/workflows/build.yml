@@ -7,10 +7,10 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: set up JDK 17
+      - name: set up JDK 21 # التعديل هنا ليتوافق مع طلب مشروعك
         uses: actions/setup-java@v4
         with:
-          java-version: '17'
+          java-version: '21'
           distribution: 'temurin'
 
       - name: Setup Node.js
@@ -22,11 +22,9 @@ jobs:
         run: |
           unzip -o final-apk-ready-project.zip
           cd final-apk-ready-project
-          # تنصيب الأدوات الأساسية غصباً عن الملفات القديمة
           npm install @capacitor/cli@latest @capacitor/core@latest @capacitor/android@latest --save-exact --force
           npm install --force --legacy-peer-deps
           npm run build
-          # إضافة المنصة وبنائها
           npx cap add android || true
           npx cap sync android
           cd android
