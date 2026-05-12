@@ -20,15 +20,13 @@ jobs:
         with:
           flutter-version: 'any'
 
-      - name: Unzip Project
-        run: unzip final-apk-ready-project.zip
-
-      - name: Build APK
+      - name: Unzip and Build
         run: |
-          find . -name "pubspec.yaml" -execdir flutter build apk --release \;
+          unzip -o final-apk-ready-project.zip
+          flutter build apk --release
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
           name: my-app-apk
-          path: "**/*.apk"
+          path: "build/app/outputs/flutter-apk/app-release.apk"
