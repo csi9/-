@@ -18,21 +18,23 @@ jobs:
         with:
           node-version: '20'
 
-      - name: Unzip and Install
+      - name: Unzip and Install Dependencies
         run: |
           unzip -o final-apk-ready-project.zip
           # الدخول للمجلد اللي فكينا ضغطه
           cd final-apk-ready-project
           npm install
-          # بناء ملفات الويب
+          # تنصيب الكاباسيتور بشكل صريح
+          npm install @capacitor/core @capacitor/cli @capacitor/android
           npm run build
 
-      - name: Build Android with Capacitor
+      - name: Create and Build Android Platform
         run: |
           cd final-apk-ready-project
-          # إضافة منصة اندرويد وبناء التطبيق
-          npx cap add android || true
+          # إنشاء مجلد الاندرويد لأنه مفقود بملفك
+          npx cap add android
           npx cap copy
+          npx cap sync
           cd android
           chmod +x gradlew
           ./gradlew assembleRelease
