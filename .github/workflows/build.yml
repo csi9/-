@@ -1,4 +1,4 @@
-name: Build Android APK
+name: Build Final Shooting Range System
 on: [workflow_dispatch]
 
 jobs:
@@ -18,22 +18,19 @@ jobs:
         with:
           node-version: '22'
 
-      - name: Full Clean Install and Build
+      - name: Extract and Patch System
         run: |
           unzip -o final-apk-ready-project.zip
           cd final-apk-ready-project
-          npm install @capacitor/cli@latest @capacitor/core@latest @capacitor/android@latest --save-exact --force
-          npm install --force --legacy-peer-deps
+          # هذا السطر هو اللي راح يكتب نظام الكاشير الحقيقي بداخل الكود
+          echo 'import React, { useState } from "react"; export default function App() { const [sales, setSales] = useState([]); const [item, setItem] = useState(""); const [price, setPrice] = useState(""); const [show, setShow] = useState(false); const add = () => { if (item && price) { setSales([...sales, { item, price: parseFloat(price), id: Date.now() }]); setItem(""); setPrice(""); } }; if (!show) return <div style={{textAlign: "center", padding: "50px", direction: "rtl", background: "#0d1117", color: "white", height: "100vh"}}> <h1>نادي الرماية - ألفا رينج</h1> <button onClick={() => setShow(true)} style={{padding: "15px 30px", fontSize: "20px", background: "#238636", color: "white", border: "none", borderRadius: "10px"}}>دخول للنظام</button> </div>; return <div style={{padding: "20px", direction: "rtl", background: "#0d1117", color: "white", minHeight: "100vh"}}> <h2>كاشير ألفا رينج</h2> <input placeholder="المادة" value={item} onChange={e => setItem(e.target.value)} style={{width: "90%", padding: "10px", marginBottom: "10px"}} /> <input placeholder="السعر" type="number" value={price} onChange={e => setPrice(e.target.value)} style={{width: "90%", padding: "10px", marginBottom: "10px"}} /> <button onClick={add} style={{width: "95%", padding: "10px", background: "#238636", color: "white"}}>إضافة</button> <div style={{marginTop: "20px", borderTop: "1px solid #30363d"}}> {sales.map(s => <div key={s.id} style={{padding: "10px", borderBottom: "1px solid #30363d"}}>{s.item}: {s.price} د.ع</div>)} <h3>المجموع: {sales.reduce((a, b) => a + b.price, 0)} د.ع</h3> </div> <button onClick={() => setShow(false)} style={{marginTop: "20px", color: "red"}}>خروج</button> </div>; }' > src/App.jsx
+          npm install --force
           npm run build
-          npx cap add android || true
           npx cap sync android
-          cd android
-          chmod +x gradlew
-          # بناء نسخة Debug (تتثبت فوراً وبدون توقيع يدوي)
-          ./gradlew assembleDebug
+          cd android && chmod +x gradlew && ./gradlew assembleDebug
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
-          name: Shooting-Club-Cashier-App
+          name: Alpha-Range-Final-App
           path: "**/android/app/build/outputs/apk/debug/*.apk"
